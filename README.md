@@ -2,9 +2,9 @@
 
 Este  o projeto MyReads, do Nanodegree de React da Udacity. Turma Setembro/17
 
-## TL;DR
+## Iniciando
 
-To get started developing right away:
+Para iniciar o projeto:
 
-* install all project dependencies with `npm install`
-* start the development server with `npm start`
+* instale as dependências com `npm install`
+* inicie o servidor de desenvolvimento com `npm start`
