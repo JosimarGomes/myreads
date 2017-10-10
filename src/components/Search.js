@@ -45,7 +45,6 @@ export default class Search extends Component {
         this.props.renderLoading(true);
         const {mybooks} =this.state;
         const arrWords = [];
-        var allBooks = [];
 
         _.map(mybooks, (book)=>{
             let arrTitle = book.title.split(" ");
