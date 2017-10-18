@@ -1,20 +1,20 @@
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 import * as BooksAPI from '../BooksAPI';
 import { Link } from 'react-router-dom';
 import BookShelf from './BookShelf';
 import '../App.css';
 import _ from 'lodash';
 
-export default class Search extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            allBooks: [],
-            mybooks: [],
-            title: ''
-        }
-    }
+
+class Search extends PureComponent {
+
+    state = {
+        allBooks: [],
+        mybooks: [],
+        title: '',
+    };
+    inDebounce = null;
 
     componentWillMount() {
         this.props.renderLoading();
@@ -27,16 +27,15 @@ export default class Search extends Component {
         );
     }
     _search(query) {
+        if(!query) return;
         this.props.renderLoading(true);
         BooksAPI.search(query).then(
             allBooks => {
-                _.map(allBooks, (bookSearch)=>{
-                    _.map(this.state.mybooks, (mybook)=>{
-                        if(bookSearch.id === mybook.id)
-                            bookSearch.shelf = mybook.shelf;
-                    })
-                })
-                this.setState({allBooks, title:'Search results...'});
+
+                if(!allBooks.error) {
+                    allBooks = this._normalizeshelf(allBooks);
+                    this.setState({allBooks, title:'Search results...'});
+                }
                 this.props.renderLoading(false);
             }
         );
@@ -64,25 +63,16 @@ export default class Search extends Component {
                     _.remove(allBooks, (book, index)=>{
                         return index > 6;
                     })
-                    _.map(allBooks, (book)=>{
-                        _.map(mybooks, (mybook)=>{
-                            if(book.id === mybook.id)
-                                book.shelf = mybook.shelf;
-                        })
-                    })
-                    
+                    allBooks = this._normalizeshelf(allBooks);
+
                     this.setState({allBooks, title:'Suggestions for you...'});
                     this.props.renderLoading(false);
                 };
 
             }
         );
-        
+
         return;
-    }
-    _reloadshelf() {
-        const inputQuery = document.getElementById("query");
-        this._search(inputQuery.value)
     }
 
     _update(book,shelf){
@@ -92,6 +82,21 @@ export default class Search extends Component {
         });
     }
 
+    _normalizeshelf(allBooks){
+        _.map(allBooks, (book)=>{
+            _.map(this.state.mybooks, (mybook)=>{
+                if(book.id === mybook.id)
+                    book.shelf = mybook.shelf;
+            })
+        })
+
+        return allBooks
+    }
+    _debounceSearch = (event) => {
+        const query = event.target.value;
+        clearTimeout(this.inDebounce);
+        this.inDebounce = setTimeout(() => this._search(query), 1000);
+    };
 
     render() {
 
@@ -100,7 +105,11 @@ export default class Search extends Component {
                 <div className="search-books-bar">
                     <Link className="close-search" to="/" />
                     <div className="search-books-input-wrapper">
-                        <input id="query" type="text" onChange={(event)=>this._search(event.target.value)} placeholder="Search by title or author"/>
+                        <input id="query"
+                            type="text"
+                            onChange={ this._debounceSearch }
+                            placeholder="Search by title or author"
+                        />
                     </div>
                 </div>
                 <div className="search-books-results">
@@ -115,3 +124,5 @@ export default class Search extends Component {
     }
 
 }
+
+export default Search;

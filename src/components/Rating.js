@@ -1,12 +1,10 @@
 import React, {Component} from 'react';
 import '../App.css';
+import Input from './Input';
 
 export default class Rating extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            value: ""
-        }
+    state = {
+        value: ""
     }
 
     componentWillMount() {
@@ -18,19 +16,19 @@ export default class Rating extends Component {
         this.props.onChangeRating(value)
     }
     render() {
+
+        const ratings = [
+            { rate: 5, title: 'Um dos melhores livros que já li!' },
+            { rate: 4, title: 'Valeu muito a pena!' },
+            { rate: 3, title: 'Gostei!' },
+            { rate: 2, title: 'Gostei!' },
+            { rate: 1, title: 'Nada mal!' },
+        ];
+
         const {value} = this.state;
         return (
             <fieldset className="rating" defaultValue="4">
-                <input type="radio" value="5"   onChange={()=>null} checked={value === 5 ? true : false} /><label onClick={()=>this._onChangeRating(5)} className="full" title="Um dos melhores livros que li"></label>
-                <input type="radio" value="4.5" onChange={()=>null} checked={value === 4.5 ? true : false} /><label onClick={()=>this._onChangeRating(4.5)} className="half" title="Um dos melhores livros que li"></label>
-                <input type="radio" value="4"   onChange={()=>null} checked={value === 4 ? true : false} /><label onClick={()=>this._onChangeRating(4)} className="full" title="Valeu muito a pena"></label>
-                <input type="radio" value="3.5" onChange={()=>null} checked={value === 3.5 ? true : false} /><label onClick={()=>this._onChangeRating(3.5)} className="half" title="Valeu muito a pena"></label>
-                <input type="radio" value="3"   onChange={()=>null} checked={value === 3 ? true : false} /><label onClick={()=>this._onChangeRating(3)} className="full" title="Gostei"></label>
-                <input type="radio" value="2.5" onChange={()=>null} checked={value === 2.5 ? true : false} /><label onClick={()=>this._onChangeRating(2.5)} className="half" title="Gostei"></label>
-                <input type="radio" value="2"   onChange={()=>null} checked={value === 2 ? true : false} /><label onClick={()=>this._onChangeRating(2)} className="full" title="Gostei"></label>
-                <input type="radio" value="1.5" onChange={()=>null} checked={value === 1.5 ? true : false} /><label onClick={()=>this._onChangeRating(1.5)} className="half" title="Interessante"></label>
-                <input type="radio" value="1"   onChange={()=>null} checked={value === 1 ? true : false} /><label onClick={()=>this._onChangeRating(1)} className="full" title="Nada mal"></label>
-                <input type="radio" value="0.5" onChange={()=>null} checked={value === 0.5 ? true : false} /><label onClick={()=>this._onChangeRating(0.5)} className="half" title="Nada mal"></label>
+                { ratings.map( (item, index)=><Input key={index} value={value} {...item} onChangeRating={(rate)=>this._onChangeRating(rate)}/> ) }
             </fieldset>
         )
     }
