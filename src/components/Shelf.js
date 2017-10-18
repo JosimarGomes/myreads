@@ -6,25 +6,22 @@ import '../App.css';
 import BookShelf from './BookShelf';
 import _ from 'lodash';
 
-export default class Shelf extends Component {
+class Shelf extends Component {
   state = {
     showSearchPage: false,
     allBooks: [],
     booksFiltered: [],
     isFiltered: false
   }
+  update = this._update.bind(this);
+  inDebounce = null;
 
   componentWillMount() {
     this._requestInit();
   }
   _update(book,shelf){
       this.props.renderLoading(true);
-      BooksAPI.update(book, shelf).then( ()=>{
-          this._reloadshelf();
-      });
-  }
-  _reloadshelf(){
-      this._requestInit();
+      BooksAPI.update(book, shelf).then(this._requestInit.bind(this));
   }
   _requestInit() {
     this.props.renderLoading(true);
@@ -47,6 +44,12 @@ export default class Shelf extends Component {
       this.setState({booksFiltered, isFiltered});
   }
 
+  _debounceFilter = (event) => {
+      const query = event.target.value;
+      clearTimeout(this.inDebounce);
+      this.inDebounce = setTimeout(() => this._filtersBook(query), 500);
+  };
+
   render() {
       const allBooks = this.state.booksFiltered.length ? this.state.booksFiltered : this.state.allBooks;
 
@@ -54,31 +57,37 @@ export default class Shelf extends Component {
         <div className="list-books">
             <div className="list-books-title">
                 <h1>MyReads</h1>
-                <input className="search-top" id="query" type="text" onChange={(event)=>this._filtersBook(event.target.value)} placeholder="Filter your books by title"/>
+                <input
+                    className="search-top"
+                    id="query"
+                    type="text"
+                    onChange={this._debounceFilter}
+                    placeholder="Filter your books by title"
+                />
             </div>
             <div className="list-books-content">
                 {  this.state.isFiltered ?
-                        < BookShelf
+                        <BookShelf
                             title={'My books'}
                             books={ this.state.booksFiltered }
-                            _updateBook={(book,shelf)=>this._update(book,shelf)}
+                            _updateBook={this.update}
                         />
                     :
                         <div>
-                            < BookShelf
+                            <BookShelf
                                 title={'Currently Reading'}
                                 books={ _.filter(allBooks, book => book.shelf === 'currentlyReading') }
-                                _updateBook={(book,shelf)=>this._update(book,shelf)}
+                                _updateBook={this.update}
                             />
-                            < BookShelf
+                            <BookShelf
                                 title={'Want to Read'}
                                 books={ _.filter(allBooks, book => book.shelf === 'wantToRead') }
-                                _updateBook={(book,shelf)=>this._update(book,shelf)}
+                                _updateBook={this.update}
                             />
-                            < BookShelf
+                            <BookShelf
                                 title={'Read'}
                                 books={ _.filter(allBooks, book => book.shelf === 'read') }
-                                _updateBook={(book,shelf)=>this._update(book,shelf)}
+                                _updateBook={this.update}
                             />
                         </div>
                 }
@@ -92,6 +101,8 @@ export default class Shelf extends Component {
       )
   }
 }
+
+export default Shelf;
 
 Shelf.propTypes = {
     renderLoading: PropTypes.func

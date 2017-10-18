@@ -8,16 +8,12 @@ export default class Book extends Component {
 
     _updateBook(book,shelf) {
         this.props.updateBook(book,shelf);
-        // BooksAPI.update(book, shelf).then( ()=>{
-        //     this.props.reloadShelf();
-        // });
     }
 
 
     _updateRating(rating) {
         const { book } = this.props;
         book.averageRating = rating;
-        // this._updateBook(book, book.shelf)
     }
 
     render() {
@@ -39,7 +35,7 @@ export default class Book extends Component {
                     </div>
                     <div className="book-title">{book.title}</div>
                     <div className="book-authors">{ _.map(book.authors, (name, index)=> <p key={index}>{name}</p>) }</div>
-                    < Rating value={book.averageRating} onChangeRating={(rating)=>this._updateRating(rating)} />
+                    <Rating value={book.averageRating} onChangeRating={(rating)=>this._updateRating(rating)} />
                 </div>
             </li>
         );
